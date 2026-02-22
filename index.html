@@ -3,209 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secret Game Chat Ultra</title>
+<title>Secret Game Secure Chat</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0f172a;
-color:white;
-text-align:center;
-}
-
-button{
-padding:10px 18px;
-border:none;
-border-radius:8px;
-background:#3b82f6;
-color:white;
-cursor:pointer;
-}
-
-input{
-padding:10px;
-width:70%;
-border-radius:6px;
-border:none;
-margin:5px;
-}
-
-#chatScreen{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#111827;
-padding:10px;
-}
-
-#messages{
-height:55vh;
-overflow-y:auto;
-padding:10px;
-display:flex;
-flex-direction:column;
-}
-
-.msg{
-margin:5px;
-padding:10px;
-border-radius:12px;
-max-width:70%;
-font-size:14px;
-}
-
-.me{
-background:#2563eb;
-align-self:flex-end;
-}
-
-.other{
-background:#374151;
-align-self:flex-start;
-}
-
-.topBar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:8px;
-background:#1f2937;
-margin-bottom:5px;
-}
-
-.small{
-font-size:12px;
-color:#9ca3af;
-}
+body{margin:0;font-family:Arial;background:#0f172a;color:white;text-align:center;}
+button{padding:8px 15px;border:none;border-radius:6px;background:#3b82f6;color:white;cursor:pointer;}
+input{padding:8px;width:70%;margin:5px;border-radius:6px;border:none;}
+#chatScreen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#111827;padding:10px;}
+#messages{height:55vh;overflow-y:auto;padding:10px;display:flex;flex-direction:column;}
+.msg{margin:5px;padding:8px;border-radius:10px;max-width:70%;}
+.me{background:#2563eb;align-self:flex-end;}
+.other{background:#374151;align-self:flex-start;}
 </style>
 </head>
 <body>
 
-<div id="game">
-<h2>🎮 Secret Tap Game</h2>
-<p>Tap 5 times OR enter secret code</p>
-<button onclick="tapGame()">Tap Me</button>
-<br><br>
-<input id="secretCode" placeholder="Enter Secret Code">
-<button onclick="unlockByCode()">Unlock</button>
+<h2>🎮 Tap 5 Times to Unlock</h2>
+<button onclick="tapGame()">Tap</button>
+
+<div id="authArea">
+<h3>Login / Register</h3>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<br>
+<button onclick="register()">Register</button>
+<button onclick="login()">Login</button>
 </div>
 
 <div id="chatScreen">
-
-<div class="topBar">
-<div>🔐 Secret Room</div>
-<div id="onlineCount" class="small"></div>
-</div>
-
-<div id="loginArea">
-<input id="username" placeholder="Enter Name">
+<h3>🔐 Secure Chat Room</h3>
 <input id="room" placeholder="Room Name">
-<button onclick="enterChat()">Enter Chat</button>
-</div>
-
+<button onclick="enterRoom()">Enter Room</button>
 <div id="chatArea" style="display:none;">
 <div id="messages"></div>
-<input id="msgInput" placeholder="Type message">
+<input id="msgInput" placeholder="Message">
 <button onclick="sendMessage()">Send</button>
 </div>
-
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "PASTE",
-authDomain: "PASTE",
-databaseURL: "PASTE",
-projectId: "PASTE",
-storageBucket: "PASTE",
-messagingSenderId: "PASTE",
-appId: "PASTE"
+apiKey:"PASTE",
+authDomain:"PASTE",
+databaseURL:"PASTE",
+projectId:"PASTE",
+storageBucket:"PASTE",
+messagingSenderId:"PASTE",
+appId:"PASTE"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getDatabase(app);
 
-let tapCount = 0;
-let currentUser = "";
-let currentRoom = "";
+let tapCount=0;
+let currentRoom="";
+let currentUser="";
 
-window.tapGame = function(){
+window.tapGame=function(){
 tapCount++;
 if(tapCount>=5){
-openSecret();
-}
-}
-
-window.unlockByCode = function(){
-let code = document.getElementById("secretCode").value;
-if(code === "7777"){
-openSecret();
-}else{
-alert("Wrong Code");
-}
-}
-
-function openSecret(){
 document.getElementById("chatScreen").style.display="block";
 }
+}
 
-window.enterChat = function(){
-currentUser = document.getElementById("username").value.trim();
-currentRoom = document.getElementById("room").value.trim();
+window.register=function(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+createUserWithEmailAndPassword(auth,email,pass)
+.then(()=>alert("Registered"))
+.catch(err=>alert(err.message));
+}
 
-if(currentUser && currentRoom){
-document.getElementById("loginArea").style.display="none";
+window.login=function(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+signInWithEmailAndPassword(auth,email,pass)
+.then(user=>{
+currentUser=user.user.email;
+alert("Login Success");
+})
+.catch(err=>alert(err.message));
+}
+
+window.enterRoom=function(){
+currentRoom=document.getElementById("room").value;
+if(currentRoom){
 document.getElementById("chatArea").style.display="block";
-
-trackOnline();
 listenMessages();
 }
 }
 
-window.sendMessage = function(){
-let text = document.getElementById("msgInput").value.trim();
-if(text){
-push(ref(db,"rooms/"+currentRoom+"/messages"),{
+window.sendMessage=function(){
+let text=document.getElementById("msgInput").value;
+
+const banned=["badword1","badword2"];
+for(let word of banned){
+if(text.includes(word)){
+alert("Inappropriate word blocked");
+return;
+}
+}
+
+push(ref(db,"rooms/"+currentRoom),{
 name:currentUser,
 text:text,
 time:Date.now()
 });
+
 document.getElementById("msgInput").value="";
-}
 }
 
 function listenMessages(){
-onChildAdded(ref(db,"rooms/"+currentRoom+"/messages"),(data)=>{
+onChildAdded(ref(db,"rooms/"+currentRoom),(data)=>{
 let msg=data.val();
 let div=document.createElement("div");
 div.classList.add("msg");
 div.classList.add(msg.name===currentUser?"me":"other");
 div.innerText=msg.name+": "+msg.text;
 document.getElementById("messages").appendChild(div);
-document.getElementById("messages").scrollTop=document.getElementById("messages").scrollHeight;
 });
 }
-
-function trackOnline(){
-const userRef=ref(db,"rooms/"+currentRoom+"/online/"+currentUser);
-set(userRef,true);
-
-onValue(ref(db,"rooms/"+currentRoom+"/online"),(snapshot)=>{
-if(snapshot.exists()){
-document.getElementById("onlineCount").innerText=
-"Online: "+Object.keys(snapshot.val()).length;
-}
-});
-}
-
 </script>
 
 </body>
