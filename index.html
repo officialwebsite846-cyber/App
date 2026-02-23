@@ -31,15 +31,6 @@ background:linear-gradient(135deg,#4e73df,#1cc88a);
 color:white;
 }
 
-header h1{
-font-size:3rem;
-}
-
-header p{
-margin:15px 0;
-font-size:1.2rem;
-}
-
 .btn{
 padding:10px 20px;
 background:white;
@@ -91,39 +82,27 @@ object-fit:cover;
 margin-bottom:15px;
 }
 
-.skills{
-margin-top:20px;
-}
-
-.skill{
-margin:10px 0;
-text-align:left;
-}
-
-.progress{
-background:#ddd;
-border-radius:10px;
-overflow:hidden;
-}
-
-.progress div{
-height:8px;
-background:#4e73df;
-}
-
-.contact input, .contact textarea{
-width:100%;
-padding:10px;
-margin:10px 0;
-border-radius:10px;
-border:1px solid #ccc;
-}
-
 footer{
 padding:20px;
 text-align:center;
 background:#222;
 color:white;
+}
+
+/* Secret Page */
+.secret-page{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#111;
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999;
 }
 
 /* Dark Mode */
@@ -135,10 +114,6 @@ color:white;
 .dark .card{
 background:#1e1e1e;
 color:white;
-}
-
-.dark .progress div{
-background:#1cc88a;
 }
 
 .dark footer{
@@ -153,7 +128,7 @@ background:black;
 <p>Mayank • Piyush • Shivansh 🚀</p>
 <button class="btn" onclick="document.getElementById('profiles').scrollIntoView()">View Profiles</button>
 <button class="btn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
-<button class="btn" onclick="secret()">Secret</button>
+<button class="btn" onclick="openLogin()">Secret</button>
 </header>
 
 <section id="profiles">
@@ -161,69 +136,53 @@ background:black;
 <div class="profiles">
 
 <div class="card">
-<img src="https://via.placeholder.com/100" alt="">
+<img src="https://via.placeholder.com/100">
 <h3>Mayank Gupta</h3>
-<p>Frontend Developer passionate about creative UI design.</p>
-<div class="skills">
-<div class="skill">HTML
-<div class="progress"><div style="width:90%"></div></div>
-</div>
-<div class="skill">CSS
-<div class="progress"><div style="width:85%"></div></div>
-</div>
-</div>
+<p>Frontend Developer passionate about UI design.</p>
 </div>
 
 <div class="card">
-<img src="https://via.placeholder.com/100" alt="">
+<img src="https://via.placeholder.com/100">
 <h3>Piyush Yadav</h3>
 <p>Backend Developer & Logical Thinker.</p>
-<div class="skills">
-<div class="skill">JavaScript
-<div class="progress"><div style="width:80%"></div></div>
-</div>
-<div class="skill">Database
-<div class="progress"><div style="width:75%"></div></div>
-</div>
-</div>
 </div>
 
 <div class="card">
-<img src="https://via.placeholder.com/100" alt="">
+<img src="https://via.placeholder.com/100">
 <h3>Shivansh Singh</h3>
 <p>Content Creator & Marketing Expert.</p>
-<div class="skills">
-<div class="skill">Editing
-<div class="progress"><div style="width:85%"></div></div>
-</div>
-<div class="skill">Marketing
-<div class="progress"><div style="width:70%"></div></div>
-</div>
-</div>
 </div>
 
 </div>
-</section>
-
-<section class="contact">
-<h2>Contact Us</h2>
-<input type="text" placeholder="Your Name">
-<input type="email" placeholder="Your Email">
-<textarea rows="4" placeholder="Your Message"></textarea>
-<button class="btn">Send Message</button>
 </section>
 
 <footer>
-<p>© 2026 Mayank, Piyush & Shivansh | Made with ❤️</p>
+<p>© 2026 Mayank, Piyush & Shivansh</p>
 </footer>
+
+<!-- Secret Page -->
+<div class="secret-page" id="secretPage">
+<h1>🎉 Welcome to Secret Page</h1>
+<p>This is hidden area only for special members 😎</p>
+<button class="btn" onclick="closeSecret()">Close</button>
+</div>
 
 <script>
 function toggleDarkMode(){
 document.body.classList.toggle("dark");
 }
 
-function secret(){
-alert("🎉 Secret Feature Coming Soon! Stay Connected!");
+function openLogin(){
+let pass = prompt("Enter Secret Password:");
+if(pass === "12345"){
+document.getElementById("secretPage").style.display="flex";
+}else{
+alert("Wrong Password ❌");
+}
+}
+
+function closeSecret(){
+document.getElementById("secretPage").style.display="none";
 }
 </script>
 
