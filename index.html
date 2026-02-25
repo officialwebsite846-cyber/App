@@ -1,87 +1,642 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Three Friends Login</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludo Game - The Hardoi Physics</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
+:root{
+--accent:#4da6ff;
+--accent-dark:#0066cc;
+--red:#ff4757;
+--green:#2ed573;
+--yellow:#ffa502;
+--blue:#3742fa;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
 body{
-font-family:Arial;
+background:linear-gradient(135deg,#000814,#001d3d,#003566);
+color:#fff;
+overflow-x:hidden;
+min-height:100vh;
+}
+
+/* ===== NAVBAR ===== */
+nav{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 20px;
+background:rgba(0,0,30,0.95);
+z-index:1000;
+backdrop-filter:blur(10px);
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.logo{
+color:var(--accent);
+font-weight:bold;
+font-size:1.3rem;
+font-family:'Cinzel',serif;
+}
+
+nav a{
+color:#fff;
+text-decoration:none;
+margin-left:20px;
+font-weight:500;
+transition:0.3s;
+}
+
+nav a:hover{
+color:var(--accent);
+}
+
+/* ===== PROFILE ICON (SECRET TRIGGER) ===== */
+.profile-trigger{
+position:fixed;
+top:80px;
+right:20px;
+width:50px;
+height:50px;
+background:rgba(255,255,255,0.1);
+border-radius:50%;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
-background:linear-gradient(135deg,#4e73df,#1cc88a);
-}
-.box{
-background:white;
-padding:30px;
-border-radius:15px;
-text-align:center;
-width:300px;
-}
-input{
-width:100%;
-padding:10px;
-margin:10px 0;
-}
-button{
-padding:10px;
-width:100%;
-background:#4e73df;
-color:white;
-border:none;
 cursor:pointer;
+z-index:999;
+transition:0.3s;
+border:2px solid transparent;
+}
+
+.profile-trigger:hover{
+background:rgba(77,166,255,0.2);
+}
+
+.profile-trigger img{
+width:40px;
+height:40px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.profile-trigger.tapped{
+border-color:var(--accent);
+animation:pulse 0.3s;
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(1);}
+50%{transform:scale(1.2);}
+}
+
+.tap-hint{
+position:fixed;
+top:140px;
+right:20px;
+font-size:0.7rem;
+color:rgba(255,255,255,0.5);
+text-align:center;
+opacity:0;
+transition:0.3s;
+}
+
+.tap-hint.show{
+opacity:1;
+}
+
+/* ===== LUDO GAME SECTION ===== */
+.ludo-section{
+padding-top:80px;
+text-align:center;
+}
+
+.ludo-section h1{
+font-family:'Cinzel',serif;
+color:var(--accent);
+margin-bottom:20px;
+font-size:2.5rem;
+}
+
+.ludo-container{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:20px;
+padding:20px;
+}
+
+.ludo-board{
+width:350px;
+height:350px;
+background:#fff;
+border-radius:10px;
+display:grid;
+grid-template-columns:repeat(15,1fr);
+grid-template-rows:repeat(15,1fr);
+gap:1px;
+padding:5px;
+box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
+
+.cell{
+background:#f0f0f0;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:0.6rem;
+font-weight:bold;
+position:relative;
+}
+
+.cell.red{background:var(--red);}
+.cell.green{background:var(--green);}
+.cell.yellow{background:var(--yellow);}
+.cell.blue{background:var(--blue);}
+
+.cell.home-red{background:linear-gradient(45deg,var(--red),#ff6b6b);}
+.cell.home-green{background:linear-gradient(45deg,var(--green),#7bed9f);}
+.cell.home-yellow{background:linear-gradient(45deg,var(--yellow),#ffeaa7);}
+.cell.home-blue{background:linear-gradient(45deg,var(--blue),#70a1ff);}
+
+.cell.safe{
+background:linear-gradient(135deg,#ffd700,#ffec8b);
+}
+
+.cell.start-red{background:linear-gradient(45deg,var(--red),#ff6b6b);}
+.cell.start-green{background:linear-gradient(45deg,var(--green),#7bed9f);}
+.cell.start-yellow{background:linear-gradient(45deg,var(--yellow),#ffeaa7);}
+.cell.start-blue{background:linear-gradient(45deg,var(--blue),#70a1ff);}
+
+/* Pieces */
+.piece{
+width:70%;
+height:70%;
+border-radius:50%;
+position:absolute;
+transition:all 0.3s ease;
+cursor:pointer;
+box-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+
+.piece.red{background:radial-gradient(circle at 30% 30%,#ff6b6b,var(--red));border:2px solid #8b0000;}
+.piece.green{background:radial-gradient(circle at 30% 30%,#7bed9f,var(--green));border:2px solid #006400;}
+.piece.yellow{background:radial-gradient(circle at 30% 30%,#ffeaa7,var(--yellow));border:2px solid #8b6914;}
+.piece.blue{background:radial-gradient(circle at 30% 30%,#70a1ff,var(--blue));border:2px solid #00008b;}
+
+.piece.selected{
+transform:scale(1.3);
+box-shadow:0 0 20px rgba(255,255,0,0.8);
+animation:bounce 0.5s infinite;
+}
+
+@keyframes bounce{
+0%,100%{transform:scale(1.3) translateY(0);}
+50%{transform:scale(1.3) translateY(-5px);}
+}
+
+.piece.killed{
+animation:kill 0.5s forwards;
+}
+
+@keyframes kill{
+0%{transform:scale(1);}
+50%{transform:scale(1.5);opacity:0.5;}
+100%{transform:scale(0);opacity:0;}
+}
+
+/* Dice Section */
+.dice-section{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:15px;
+}
+
+.dice{
+width:80px;
+height:80px;
+background:#fff;
+border-radius:15px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:2.5rem;
+font-weight:bold;
+color:#333;
+cursor:pointer;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+transition:0.3s;
+}
+
+.dice:hover{
+transform:scale(1.05);
+}
+
+.dice.rolling{
+animation:roll 0.5s linear infinite;
+}
+
+@keyframes roll{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+.player-info{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.player-card{
+background:rgba(255,255,255,0.1);
+padding:15px 25px;
+border-radius:10px;
+text-align:center;
+min-width:100px;
+}
+
+.player-card.active{
+background:rgba(77,166,255,0.3);
+border:2px solid var(--accent);
+}
+
+.player-card h4{
+margin-bottom:5px;
+}
+
+.player-card .pieces-left{
+font-size:0.9rem;
+color:#ccc;
+}
+
+/* ===== SECRET CHAT OVERLAY ===== */
+.chat-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+z-index:9999;
+display:none;
+justify-content:center;
+align-items:center;
+opacity:0;
+transition:0.5s;
+}
+
+.chat-overlay.active{
+display:flex;
+opacity:1;
+}
+
+.chat-container{
+width:100%;
+max-width:400px;
+height:90%;
+background:#0d1418;
+border-radius:20px;
+overflow:hidden;
+display:flex;
+flex-direction:column;
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
+animation:slideUp 0.5s ease;
+}
+
+@keyframes slideUp{
+from{transform:translateY(100px);opacity:0;}
+to{transform:translateY(0);opacity:1;}
+}
+
+.chat-header{
+background:#1f2c34;
+padding:15px;
+display:flex;
+align-items:center;
+gap:15px;
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.chat-header img{
+width:45px;
+height:45px;
+border-radius:50%;
+object-fit:cover;
+border:2px solid var(--accent);
+}
+
+.chat-header-info h3{
+color:#fff;
+font-size:1rem;
+margin-bottom:3px;
+}
+
+.chat-header-info p{
+color:#25D366;
+font-size:0.75rem;
+}
+
+.close-chat{
+margin-left:auto;
+background:none;
+border:none;
+color:#fff;
+font-size:1.5rem;
+cursor:pointer;
+transition:0.3s;
+}
+
+.close-chat:hover{
+color:var(--accent);
+transform:rotate(90deg);
+}
+
+.chat-messages{
+flex:1;
+padding:20px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:15px;
+background:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+background-size:cover;
+}
+
+.message{
+max-width:80%;
+padding:10px 15px;
+border-radius:10px;
+font-size:0.9rem;
+line-height:1.4;
+animation:fadeIn 0.3s ease;
+}
+
+.message.received{
+background:#262626;
+color:#fff;
+align-self:flex-start;
+border-bottom-left-radius:0;
+}
+
+.message.sent{
+background:#056162;
+color:#fff;
+align-self:flex-end;
+border-bottom-right-radius:0;
+}
+
+.message-time{
+font-size:0.65rem;
+opacity:0.7;
 margin-top:5px;
+text-align:right;
+}
+
+.chat-input{
+background:#1f2c34;
+padding:15px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.chat-input input{
+flex:1;
+padding:12px 15px;
+border-radius:25px;
+border:none;
+background:rgba(255,255,255,0.1);
+color:#fff;
+font-size:0.9rem;
+}
+
+.chat-input input::placeholder{
+color:rgba(255,255,255,0.5);
+}
+
+.chat-input button{
+background:var(--accent);
+border:none;
+width:45px;
+height:45px;
+border-radius:50%;
+color:#fff;
+font-size:1.2rem;
+cursor:pointer;
+transition:0.3s;
+}
+
+.chat-input button:hover{
+transform:scale(1.1);
+background:#25D366;
+}
+
+/* Room Info */
+.room-info{
+background:rgba(77,166,255,0.1);
+padding:10px;
+text-align:center;
+font-size:0.85rem;
+color:var(--accent);
+}
+
+.room-info span{
+font-weight:bold;
+}
+
+/* Typing Indicator */
+.typing-indicator{
+display:none;
+padding:10px 15px;
+align-self:flex-start;
+}
+
+.typing-indicator span{
+width:8px;
+height:8px;
+background:#888;
+border-radius:50%;
+display:inline-block;
+margin:0 2px;
+animation:typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2){animation-delay:0.2s;}
+.typing-indicator span:nth-child(3){animation-delay:0.4s;}
+
+@keyframes typing{
+0%,100%{transform:translateY(0);opacity:0.4;}
+50%{transform:translateY(-5px);opacity:1;}
+}
+
+/* ===== FOOTER ===== */
+footer{
+padding:20px;
+background:#000814;
+text-align:center;
+color:#aaa;
+margin-top:40px;
+}
+
+/* Responsive */
+@media(max-width:768px){
+.ludo-board{
+width:300px;
+height:300px;
+}
+.chat-container{
+height:100%;
+max-width:100%;
+border-radius:0;
+}
+.profile-trigger{
+top:80px;
+right:10px;
+width:40px;
+height:40px;
+}
+.profile-trigger img{
+width:32px;
+height:32px;
+}
 }
 </style>
 </head>
 <body>
 
-<div class="box">
-<h2>Three Friends Login</h2>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<button onclick="signup()">Signup</button>
+<nav>
+<div class="logo">🎮 Ludo Game</div>
+<div>
+<a href="#" onclick="showLudo()">Play Ludo</a>
+<a href="#" onclick="showHome()">Home</a>
+</div>
+</nav>
+
+<!-- Secret Profile Trigger -->
+<div class="profile-trigger" id="profileTrigger" onclick="handleProfileTap()">
+<img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100" alt="Profile">
+</div>
+<div class="tap-hint" id="tapHint">Tap 3 times for Secret Chat! 👆</div>
+
+<!-- ===== LUDO GAME SECTION ===== -->
+<section class="ludo-section" id="ludoSection">
+<h1>🎲 Play Ludo</h1>
+
+<div class="ludo-container">
+<div class="player-info">
+<div class="player-card active" id="playerRed">
+<h4 style="color:var(--red);">🔴 Red</h4>
+<span class="pieces-left">4 Pieces</span>
+</div>
+<div class="player-card" id="playerGreen">
+<h4 style="color:var(--green);">🟢 Green</h4>
+<span class="pieces-left">4 Pieces</span>
+</div>
+<div class="player-card" id="playerYellow">
+<h4 style="color:var(--yellow);">🟡 Yellow</h4>
+<span class="pieces-left">4 Pieces</span>
+</div>
+<div class="player-card" id="playerBlue">
+<h4 style="color:var(--blue);">🔵 Blue</h4>
+<span class="pieces-left">4 Pieces</span>
+</div>
 </div>
 
+<div class="ludo-board" id="ludoBoard">
+<!-- Board will be generated by JavaScript -->
+</div>
+
+<div class="dice-section">
+<div class="dice" id="dice" onclick="rollDice()">🎲</div>
+<p id="turnInfo">🔴 Red's Turn</p>
+</div>
+</div>
+</section>
+
+<!-- ===== SECRET CHAT OVERLAY ===== -->
+<div class="chat-overlay" id="chatOverlay">
+<div class="chat-container">
+<div class="chat-header">
+<img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100" alt="Sumit Sir">
+<div class="chat-header-info">
+<h3>Secret Chat 💬</h3>
+<p>● Online - Real-time Messaging</p>
+</div>
+<button class="close-chat" onclick="closeSecretChat()">✕</button>
+</div>
+
+<div class="room-info">
+Room ID: <span id="roomId">LOADING...</span> | Share this ID to connect with friends
+</div>
+
+<div class="chat-messages" id="chatMessages">
+<div class="message received">
+🎉 Welcome to Secret Chat!
+<span class="message-time">Now</span>
+</div>
+<div class="message received">
+💡 Share the Room ID with your friend to chat in real-time!
+<span class="message-time">Now</span>
+</div>
+</div>
+
+<div class="typing-indicator" id="typingIndicator">
+<span></span><span></span><span></span>
+</div>
+
+<div class="chat-input">
+<input type="text" id="chatInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
+<button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+</div>
+
+<footer>
+<p>© 2025 Ludo Game | The Hardoi Physics</p>
+</footer>
+
+<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDxvyhMA3JbvhYcyJPviGqsw9oQxOxexHw",
-  authDomain: "three-friends-chat.firebaseapp.com",
-  projectId: "three-friends-chat",
-  storageBucket: "three-friends-chat.firebasestorage.app",
-  messagingSenderId: "548382848831",
-  appId: "1:548382848831:web:eb3fd0d6ee8df85cc5458a"
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+projectId: "YOUR_PROJECT",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "YOUR_SENDER_ID",
+appId: "YOUR_APP_ID"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-window.login = function(){
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
-
-signInWithEmailAndPassword(auth, email, password)
-.then(() => {
-window.location.href = "secret.html";
-})
-.catch(err => alert(err.message));
+// Initialize Firebase
+let app, db;
+try {
+app = initializeApp(firebaseConfig);
+db = getDatabase(app);
+console.log("Firebase connected!");
+} catch(e) {
+console.log("Firebase not configured - using local mode");
 }
 
-window.signup = function(){
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
-
-createUserWithEmailAndPassword(auth, email, password)
-.then(() => alert("Account Created! Now Login"))
-.catch(err => alert(err.message));
-}
-</script>
-
-</body>
-</html>
+// Generate Room ID
+function generateRoomId() {
+return Math.random().toString(36).
